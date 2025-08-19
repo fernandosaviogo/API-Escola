@@ -4,8 +4,8 @@ class UserController {
   async store(req, res) {   // store = method POST
     try {
       const novoUser = await User.create(req.body);
-      return res.json({ novoUser });
-
+      const { id, name, email } = novoUser;
+      return res.json({ id, name, email });
     } catch (e) {
       return res.status(400).json({
         errors: e.errors.map((err) => err.message)
@@ -17,9 +17,8 @@ class UserController {
   async index(req, res) {
     try {
       const users = await User.findAll();
-      console.log('USER ID', req.userId);
-      console.log('USER EMAIL', req.userEmail);
-      return res.json(users);
+      const { id, name, email } = users;
+      return res.json({ id, name, email });
     } catch(e) {
       return res.json(null);
     }
@@ -29,7 +28,8 @@ class UserController {
   async show(req, res) {
     try {
       const user = await User.findByPk(req.params.id);
-      return res.json(user);
+      const { id, name, email } = user;
+      return res.json({ id, name, email });
     } catch(e) {
       return res.json(null);
     }
@@ -38,13 +38,7 @@ class UserController {
   // UPDATE
     async update(req, res) {
     try {
-      if(!req.params.id) {
-        return res.status(400).json({
-          errors: ['ID não enviado.']
-        });
-      }
-
-      const user = await User.findByPk(req.params.id);
+      const user = await User.findByPk(req.userId);
 
       if(!user) {
         return res.status(400).json({
@@ -53,7 +47,8 @@ class UserController {
       }
 
       const novosDados = await user.update(req.body);
-      return res.json(novosDados);
+      const { id, name, email } = novosDados;
+      return res.json({ id, name, email });
     } catch(e) {
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -64,13 +59,7 @@ class UserController {
   // DELETE
   async delete(req, res) {
     try {
-      if(!req.params.id) {
-        return res.status(400).json({
-          errors: ['ID não enviado.']
-        });
-      }
-
-      const user = await User.findByPk(req.params.id);
+      const user = await User.findByPk(req.userId);
 
       if(!user) {
         return res.status(400).json({
@@ -79,7 +68,7 @@ class UserController {
       }
 
       await user.destroy();
-      return res.json(user);
+      return res.json(null);
     } catch(e) {
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
